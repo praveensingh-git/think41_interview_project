@@ -18,5 +18,5 @@ CREATE TABLE IF NOT EXISTS orders (
     quantity INT,
     price NUMERIC,
     status TEXT,
-    order_date DATE
+    order_date DATE
 );
