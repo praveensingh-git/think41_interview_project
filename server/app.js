@@ -6,6 +6,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const orderRoutes=require('./routes/orders');
+app.use('/orders', orderRoutes)
+
 
 app.get('/', (req, res) => {
   res.send('✅ Customer Order Dashboard API is running. Use /customers or /customers/:id');

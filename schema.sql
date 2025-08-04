@@ -1,8 +1,11 @@
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE IF NOT EXISTS users (
     user_id INT PRIMARY KEY,
     first_name TEXT,
     last_name TEXT,
-    email TEXT UNIQUE,
+    email TEXT, 
     gender TEXT,
     address TEXT,
     city TEXT,

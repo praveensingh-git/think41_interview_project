@@ -29,38 +29,50 @@ except Exception as e:
     print(f"❌ Error creating tables: {e}")
 
 # Load users.csv
-try:
-    with open('users.csv', newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
 
-        for row in reader:
+with open('users.csv', newline='', encoding='utf-8') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        try:
             cur.execute("""
-                INSERT INTO users (user_id, first_name, last_name, email, gender, address, city, state, country, postal_code)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO users (
+                    user_id, first_name, last_name, email, gender, address, city, state, country, postal_code
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (user_id) DO NOTHING
             """, (
-                row['User Id'], row['First Name'], row['Last Name'], row['Email'],
-                row['Gender'], row['Address'], row['City'], row['State'],
-                row['Country'], row['Postal Code']
+                int(row['id']),
+                row['first_name'],
+                row['last_name'],
+                row['email'],
+                row['gender'],
+                row['street_address'],
+                row['city'],
+                row['state'],
+                row['country'],
+                row['postal_code']
             ))
-    print("✅ Users loaded successfully.")
-except Exception as e:
-    print(f"❌ Error loading users.csv: {e}")
+        except Exception as e:
+            print(f"⚠️ Skipped user {row.get('id', 'unknown')}: {e}")
+
 
 # Load orders.csv
 try:
-    with open('orders.csv', newline='', encoding='utf-8') as f:
+    with open('orders.csv', newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f)
+        print("🔍 CSV Headers (orders.csv):", reader.fieldnames)
 
         for row in reader:
-            cur.execute("""
-                INSERT INTO orders (order_id, user_id, product, quantity, price, status, order_date)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (order_id) DO NOTHING
-            """, (
-                row['Order Id'], row['User Id'], row['Product Name'], row['Quantity'],
-                row['Price'], row['Status'], row['Order Date']
-            ))
+            try:
+                cur.execute("""
+                    INSERT INTO orders (order_id, user_id, product, quantity, price, status, order_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (order_id) DO NOTHING
+                """, (
+                    row['order_id'], row['user_id'], "Unknown Product", row['num_of_item'],
+                    0.0, row['status'], row['created_at']
+                ))
+            except psycopg2.Error as e:
+                print(f"⚠️ Skipped order {row['order_id']}: {e.pgerror.strip()}")
     print("✅ Orders loaded successfully.")
 except Exception as e:
     print(f"❌ Error loading orders.csv: {e}")
